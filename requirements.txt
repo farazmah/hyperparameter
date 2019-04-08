@@ -2,3 +2,5 @@ hyperopt=0.1
 xgboost=0.72
 lightgbm=2.2.1
 sklearn=0.19.1
+numpy>=1.14
+pandas>=0.23
