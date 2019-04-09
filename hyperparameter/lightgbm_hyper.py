@@ -30,10 +30,21 @@ class Hyperparemeter:
     parameters
     ----------
     is_classifier : bool
-        Determines if the hyperparameter object is used for classification, defaul is regression
+        Determines if the hyperparameter object is used for classification, default is regression
+
+    attributes
+    ----------
+    loss_metric: str
+        specifying the loss function to be minimised.  Dependent on is_classifier paramter
+    estimator: lightgbm object
+        lightgbm estimator object. Classifier or Regressor dependent on is_classifier parameter
+    params: dict
+        tuned paramters after tune_model method is called
+    trials: hyperopt.Trials
+        the hyperopt trials object after hyperparameter tuning.
     """
 
-    def __init__(self, is_classifier=False, is_xgboost=False):
+    def __init__(self, is_classifier=False):
         if is_classifier:
             self.loss_metric = 'neg_log_loss'
             self.estimator = lightgbm.LGBMClassifier()
@@ -43,18 +54,17 @@ class Hyperparemeter:
         self.params = None
         self.trials = None
 
-    def optimize(self, trials, score, added_evals):
+    @staticmethod
+    def optimize(trials, score, evals_rounds):
         """
         This function specifies the hyperparameter search space and minimises the score function
 
         :param trials: hyperopt.Trials
             hyperopt trials object responsible for the hyperparameter search
-        :param mon_cons: str
-            string of tuples specifying the monotonic constraint
         :param score: function
             the loss or score function to be minimised
-        :param added_evals: int
-            additional evals for hyperopt if previously tuned
+        :param evals_rounds: int
+            number of evaluation rounds for hyperparameter tuning
         :return: best: dict
             the best hyperparameters
         """
@@ -71,31 +81,30 @@ class Hyperparemeter:
             'reg_alpha': hp.quniform('reg_alpha', 1, 10, 0.01),
         }
 
-        best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=added_evals)
+        best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
         logging.info('BEST_PARAMETERS')
         logging.info(best)
         return best
 
-
-    def create_loss_func(self, X_train, y_train, folds):
+    def create_loss_func(self, x_train, y_train, folds):
         """
         This function is responsible for creating the score function based on training data and kfolds object
 
-        :param X_train: Pandas.Dataframe
+        :param x_train: Pandas.Dataframe or numpy.array
             The training data
-        :param y_train: pandas.Dataframe
+        :param y_train: pandas.Dataframe or numpy.array
             The training label
-        :param folds: sklearn.model_selection.Kfold
+        :param folds: sklearn.model_selection
             the kfold crossvalidation object
-        :return: score: function
-            score function to be minimised
+        :return: loss_func: function
+            loss function to be minimised
         """
 
         def loss_func(params):
             logging.info("Training with params : ")
             logging.info(params)
             model = self.estimator.set_params(**params)
-            loss = cross_val_score(model, X_train, y_train, cv=folds, scoring=self.loss_metric).mean() * -1
+            loss = cross_val_score(model, x_train, y_train, cv=folds, scoring=self.loss_metric).mean() * -1
             logging.info("\tLoss {0}\n".format(loss))
             return {'loss': loss, 'status': STATUS_OK}
 
@@ -105,18 +114,18 @@ class Hyperparemeter:
         """
         Main function responsible for tuning hyperparameters
 
-        :param ds_x: pandas.Dataframe
+        :param ds_x: pandas.Dataframe or numpy.array
             Training data
-        :param ds_y: pandas.Dataframe
+        :param ds_y: pandas.Dataframe or numpy.array
             Training label
-        :param folds: sklearn model_selection or cross_validation object
-            fkolds for crossvaliation of hyper parameter
+        :param folds: sklearn.model_selection or sklearn.cross_validation object
+            fkolds for crossvaliation of hyperparameters
+        :param eval_rounds: int
+            number of iterations to run the hyperparameter turning
         :param trials: hyperopt.Trials object
             pretuned hyperopt trials object if available
         :return: parameters: dict
             the best hyperparameters
-                 trials: hyperopt.Trials
-            the hyperopt trials object post tuning for saving
         """
         # Create hyperopt Trials object
         if trials is None:
@@ -129,7 +138,7 @@ class Hyperparemeter:
         loss_func = self.create_loss_func(ds_x, ds_y, folds)
 
         # Find optimal hyperparameters
-        parameters = self.optimize(trials, loss_func, additional_evals)
+        parameters = Hyperparemeter.optimize(trials, loss_func, additional_evals)
 
         # Convert the relevant hyperparameters to int
         parameters['n_estimators'] = int(parameters['n_estimators'])
