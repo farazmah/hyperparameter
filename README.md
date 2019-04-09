@@ -2,8 +2,8 @@
 
 Installation
 ```
-git clone git@bitbucket.org:wesaac/frameworks_hyperparameter.git
-cd frameworks_hyperparamter/hyperparameter
+git clone git@bitbucket.org:wesaac/hyperparameter.git
+cd hyperparamter/hyperparameter
 python ../setup.py install
 ```
 
