@@ -139,4 +139,4 @@ class Hyperparemeter:
         self.params = parameters
         self.trials = trials
 
-        return parameters, trials
+        return parameters
