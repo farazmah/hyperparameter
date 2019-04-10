@@ -1,5 +1,5 @@
 """
-This is the main module of the hyperparameter tuning for lightgbm using hyperopt
+This is the main module of the hyperparameter tuning using hyperopt
 """
 
 import logging
@@ -84,7 +84,7 @@ class Hyperparemeter:
 
         return loss_func
 
-    def tune_model(self, ds_x, ds_y, folds, eval_rounds=100, trials=None):
+    def tune_model(self, ds_x, ds_y, folds, eval_rounds=100, trials=None, mon_cons=None, categorical=None):
         """
         Main function responsible for tuning hyperparameters
 
@@ -112,7 +112,7 @@ class Hyperparemeter:
         loss_func = self.create_loss_func(ds_x, ds_y, folds)
 
         # Find optimal hyperparameters
-        parameters = self.optimize(trials, loss_func, additional_evals)
+        parameters = self.optimize(trials, loss_func, additional_evals, mon_cons, categorical)
 
         # Convert the relevant hyperparameters to int
         parameters['n_estimators'] = int(parameters['n_estimators'])
@@ -135,7 +135,7 @@ class LightgbmHyper(Hyperparemeter):
             self.estimator = lightgbm.LGBMRegressor()
 
     @classmethod
-    def optimize(cls, trials, score, evals_rounds):
+    def optimize(cls, trials, score, evals_rounds, mon_cons=None, categorical=None):
         """
         This function specifies the hyperparameter search space and minimises the score function
 
@@ -159,6 +159,8 @@ class LightgbmHyper(Hyperparemeter):
             'min_sum_hessian_in_leaf': hp.quniform('min_sum_hessian_in_leaf', 0.001, 0.9, 0.001),
             'reg_lambda': hp.quniform('reg_lambda', 0.01, 1, 0.01),
             'reg_alpha': hp.quniform('reg_alpha', 1, 10, 0.01),
+            'monotone_constraints': mon_cons,
+            'categorical_feature': categorical
         }
 
         best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
