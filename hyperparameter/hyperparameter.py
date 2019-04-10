@@ -3,6 +3,7 @@ This is the main module of the hyperparameter tuning for lightgbm using hyperopt
 """
 
 import logging
+from abc import ABCMeta, abstractmethod
 
 import pandas as pd
 import numpy as np
@@ -44,47 +45,20 @@ class Hyperparemeter:
         the hyperopt trials object after hyperparameter tuning.
     """
 
+    __metaclass__ = ABCMeta
+
     def __init__(self, is_classifier=False):
         if is_classifier:
             self.loss_metric = 'neg_log_loss'
-            self.estimator = lightgbm.LGBMClassifier()
         else:
             self.loss_metric = 'neg_mean_squared_error'
-            self.estimator = lightgbm.LGBMRegressor()
         self.params = None
         self.trials = None
 
-    @staticmethod
-    def optimize(trials, score, evals_rounds):
-        """
-        This function specifies the hyperparameter search space and minimises the score function
-
-        :param trials: hyperopt.Trials
-            hyperopt trials object responsible for the hyperparameter search
-        :param score: function
-            the loss or score function to be minimised
-        :param evals_rounds: int
-            number of evaluation rounds for hyperparameter tuning
-        :return: best: dict
-            the best hyperparameters
-        """
-        space = {
-            'n_estimators': scope.int(hp.quniform('n_estimators', 10, 3000, 5)),
-            'learning_rate': hp.quniform('learning_rate', 0.05, 0.3, 0.025),
-            'max_depth': scope.int(hp.quniform('max_depth', 1, 20, 1)),
-            'num_leaves': scope.int(hp.quniform('num_leaves', 2, 1024, 2)),
-            'min_child_samples': scope.int(hp.quniform('min_child_samples', 2, 100, 1)),
-            'subsample': hp.quniform('subsample', 0.6, 1, 0.05),  # bagging_fraction
-            'colsample_bytree': hp.quniform('colsample_bytree', 0.4, 1, 0.1),  # feature_fraction
-            'min_sum_hessian_in_leaf': hp.quniform('min_sum_hessian_in_leaf', 0.001, 0.9, 0.001),
-            'reg_lambda': hp.quniform('reg_lambda', 0.01, 1, 0.01),
-            'reg_alpha': hp.quniform('reg_alpha', 1, 10, 0.01),
-        }
-
-        best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
-        logging.info('BEST_PARAMETERS')
-        logging.info(best)
-        return best
+    @classmethod
+    @abstractmethod
+    def optimize(cls, trials, score, evals_rounds):
+        raise NotImplementedError
 
     def create_loss_func(self, x_train, y_train, folds):
         """
@@ -138,7 +112,7 @@ class Hyperparemeter:
         loss_func = self.create_loss_func(ds_x, ds_y, folds)
 
         # Find optimal hyperparameters
-        parameters = Hyperparemeter.optimize(trials, loss_func, additional_evals)
+        parameters = self.optimize(trials, loss_func, additional_evals)
 
         # Convert the relevant hyperparameters to int
         parameters['n_estimators'] = int(parameters['n_estimators'])
@@ -149,3 +123,46 @@ class Hyperparemeter:
         self.trials = trials
 
         return parameters
+
+
+class LightgbmHyper(Hyperparemeter):
+
+    def __init__(self, is_classifier=False):
+        super().__init__(is_classifier=False)
+        if is_classifier:
+            self.estimator = lightgbm.LGBMClassifier()
+        else:
+            self.estimator = lightgbm.LGBMRegressor()
+
+    @classmethod
+    def optimize(cls, trials, score, evals_rounds):
+        """
+        This function specifies the hyperparameter search space and minimises the score function
+
+        :param trials: hyperopt.Trials
+            hyperopt trials object responsible for the hyperparameter search
+        :param score: function
+            the loss or score function to be minimised
+        :param evals_rounds: int
+            number of evaluation rounds for hyperparameter tuning
+        :return: best: dict
+            the best hyperparameters
+        """
+        space = {
+            'n_estimators': scope.int(hp.quniform('n_estimators', 10, 3000, 5)),
+            'learning_rate': hp.quniform('learning_rate', 0.05, 0.3, 0.025),
+            'max_depth': scope.int(hp.quniform('max_depth', 1, 20, 1)),
+            'num_leaves': scope.int(hp.quniform('num_leaves', 2, 1024, 2)),
+            'min_child_samples': scope.int(hp.quniform('min_child_samples', 2, 100, 1)),
+            'subsample': hp.quniform('subsample', 0.6, 1, 0.05),  # bagging_fraction
+            'colsample_bytree': hp.quniform('colsample_bytree', 0.4, 1, 0.1),  # feature_fraction
+            'min_sum_hessian_in_leaf': hp.quniform('min_sum_hessian_in_leaf', 0.001, 0.9, 0.001),
+            'reg_lambda': hp.quniform('reg_lambda', 0.01, 1, 0.01),
+            'reg_alpha': hp.quniform('reg_alpha', 1, 10, 0.01),
+        }
+
+        best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
+        logging.info('BEST_PARAMETERS')
+        logging.info(best)
+        return best
+
