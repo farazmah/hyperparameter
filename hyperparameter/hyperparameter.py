@@ -24,7 +24,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-class Hyperparemeter:
+class Hyperparameter:
     """
     This is the main class of the hyperparameter framework.
 
@@ -151,11 +151,6 @@ class Hyperparemeter:
         # Find optimal hyperparameters
         parameters = self.optimize(trials, loss_func, additional_evals, mon_cons, categorical)
 
-        # Convert the relevant hyperparameters to int
-        parameters['n_estimators'] = int(parameters['n_estimators'])
-        parameters['max_depth'] = int(parameters['max_depth'])
-        parameters['num_leaves'] = int(parameters['num_leaves'])
-
         self.params = parameters
         self.trials = trials
 
@@ -205,6 +200,12 @@ class LightgbmHyper(Hyperparemeter):
         }
 
         best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
+
+        # Convert the relevant hyperparameters to int
+        best['n_estimators'] = int(best['n_estimators'])
+        best['max_depth'] = int(best['max_depth'])
+        best['num_leaves'] = int(best['num_leaves'])
+
         logging.info('BEST_PARAMETERS')
         logging.info(best)
         return best
