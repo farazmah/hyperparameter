@@ -27,7 +27,7 @@ skf = StratifiedKFold(n_splits=3)
 from hyperparameter.hyperparameter import LightgbmHyper
 hpopt = LightgbmHyper(is_classifier=True)
 
-hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20, trials=None)
+hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
 
 ```
 
