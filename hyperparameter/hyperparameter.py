@@ -157,7 +157,7 @@ class Hyperparameter:
         return parameters
 
 
-class LightgbmHyper(Hyperparemeter):
+class LightgbmHyper(Hyperparameter):
 
     def __init__(self, is_classifier=False):
         super().__init__(is_classifier=False)
