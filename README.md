@@ -2,7 +2,7 @@
 
 Installation
 ```
-git clone git@bitbucket.org:wesaac/hyperparameter.git
+git clone https://faraz_ma@bitbucket.org/wesaac/hyperparameter.git
 cd hyperparamter/hyperparameter
 python ../setup.py install
 ```
