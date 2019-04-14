@@ -205,6 +205,7 @@ class LightgbmHyper(Hyperparameter):
         best['n_estimators'] = int(best['n_estimators'])
         best['max_depth'] = int(best['max_depth'])
         best['num_leaves'] = int(best['num_leaves'])
+        best['min_child_samples'] = int(best['min_child_samples'])
 
         logging.info('BEST_PARAMETERS')
         logging.info(best)
