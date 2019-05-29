@@ -31,3 +31,11 @@ hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
 
 ```
 
+Usage example for xgboost (last two lines from example above changes to):
+
+```python
+hpot = XgboostHyper(is_classfier=True)
+
+hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
+
+```
