@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-df = pd.read_json("../titanic/train.json")
+df = pd.read_csv("./test/titanic_train.csv")
 df = df.replace("", np.nan)
 df = df.drop(['Cabin', 'Name', 'PassengerId', 'Ticket'], axis=1)
 df = pd.get_dummies(columns=['Embarked', 'Sex'],data=df)
