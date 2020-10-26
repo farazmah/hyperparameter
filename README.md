@@ -1,4 +1,4 @@
-### Hyperparameter optimisation framework for [lightgbm](https://github.com/microsoft/LightGBM) and [xgboost](https://github.com/dmlc/xgboost) using [hyperopt](https://github.com/hyperopt/hyperopt)
+### Hyperparameter optimisation utility for [lightgbm](https://github.com/microsoft/LightGBM) and [xgboost](https://github.com/dmlc/xgboost) using [hyperopt](https://github.com/hyperopt/hyperopt)
 
 Installation
 ```
