@@ -14,11 +14,12 @@ from hyperopt import STATUS_OK, Trials
 # Logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
 
 class Hyperparameter:
     """
@@ -84,7 +85,7 @@ class Hyperparameter:
             if self.is_classier:
                 test_preds = model.predict_proba(x_te)[:, 1]
             else:
-                test_preds = model.predict(x_te)[:, ]
+                test_preds = model.predict(x_te)[:,]
             loss = self.loss_metric(y_true=y_te, y_pred=test_preds)
             losses.append(loss)
         return np.mean(losses)
@@ -104,18 +105,28 @@ class Hyperparameter:
         :return: loss_func: function
             loss function to be minimised
         """
+
         def loss_func(params):
             logging.info("Training with params : ")
             logging.info(params)
             model = self.estimator.set_params(**params)
             loss = self.cross_validation_score(model, x_train, y_train, folds, groups)
             logging.info("\tLoss {0}\n".format(loss))
-            return {'loss': loss, 'status': STATUS_OK}
+            return {"loss": loss, "status": STATUS_OK}
 
         return loss_func
 
-    def tune_model(self, ds_x, ds_y, folds, eval_rounds=100, groups=None, trials=None, mon_cons=None,
-                   categorical=None):
+    def tune_model(
+        self,
+        ds_x,
+        ds_y,
+        folds,
+        eval_rounds=100,
+        groups=None,
+        trials=None,
+        mon_cons=None,
+        categorical=None,
+    ):
         """
         Main function responsible for tuning hyperparameters
 
@@ -149,7 +160,9 @@ class Hyperparameter:
         loss_func = self.create_loss_func(ds_x, ds_y, folds, groups)
 
         # Find optimal hyperparameters
-        parameters = self.optimize(trials, loss_func, additional_evals, mon_cons, categorical)
+        parameters = self.optimize(
+            trials, loss_func, additional_evals, mon_cons, categorical
+        )
 
         self.params = parameters
         self.trials = trials

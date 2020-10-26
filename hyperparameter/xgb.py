@@ -12,7 +12,7 @@ from .base import Hyperparameter
 # Logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
@@ -20,7 +20,6 @@ logger.addHandler(ch)
 
 
 class XgboostHyper(Hyperparameter):
-
     def __init__(self, is_classifier=False):
         super().__init__(is_classifier=False)
         if is_classifier:
@@ -47,26 +46,28 @@ class XgboostHyper(Hyperparameter):
             the best hyperparameters
         """
         space = {
-            'n_estimators': scope.int(hp.uniform('n_estimators', 10, 3000)),
-            'learning_rate': hp.quniform('learning_rate', 0.01, 0.3, 0.01),
-            'max_depth': scope.int(hp.quniform('max_depth', 1, 15, 1)),
-            'min_child_weight': hp.quniform('min_child_weight', 1, 9, 1),
-            'subsample': hp.quniform('subsample', 0.6, 1, 0.05),
-            'gamma': hp.quniform('gamma', 0.05, 3, 0.05),
-            'colsample_bytree': hp.quniform('colsample_bytree', 0.4, 1, 0.05),
-            'colsample_bylevel': hp.quniform('colsample_bylevel', 0.4, 1, 0.05),
-            'reg_lambda': hp.quniform('reg_lambda', 0.01, 2, 0.01),
-            'reg_alpha': hp.quniform('reg_alpha', 0, 10, 1),
+            "n_estimators": scope.int(hp.uniform("n_estimators", 10, 3000)),
+            "learning_rate": hp.quniform("learning_rate", 0.01, 0.3, 0.01),
+            "max_depth": scope.int(hp.quniform("max_depth", 1, 15, 1)),
+            "min_child_weight": hp.quniform("min_child_weight", 1, 9, 1),
+            "subsample": hp.quniform("subsample", 0.6, 1, 0.05),
+            "gamma": hp.quniform("gamma", 0.05, 3, 0.05),
+            "colsample_bytree": hp.quniform("colsample_bytree", 0.4, 1, 0.05),
+            "colsample_bylevel": hp.quniform("colsample_bylevel", 0.4, 1, 0.05),
+            "reg_lambda": hp.quniform("reg_lambda", 0.01, 2, 0.01),
+            "reg_alpha": hp.quniform("reg_alpha", 0, 10, 1),
             #'monotone_constraints': mon_cons,
         }
 
-        best = fmin(score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds)
+        best = fmin(
+            score, space, algo=tpe.suggest, trials=trials, max_evals=evals_rounds
+        )
 
         # Convert the relevant hyperparameters to int
-        best['n_estimators'] = int(best['n_estimators'])
-        best['max_depth'] = int(best['max_depth'])
-        best['min_child_weight'] = int(best['min_child_weight'])
+        best["n_estimators"] = int(best["n_estimators"])
+        best["max_depth"] = int(best["max_depth"])
+        best["min_child_weight"] = int(best["min_child_weight"])
 
-        logger.info('BEST_PARAMETERS')
+        logger.info("BEST_PARAMETERS")
         logger.info(best)
         return best
