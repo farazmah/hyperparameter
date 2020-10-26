@@ -1,6 +1,6 @@
-hyperopt=0.1
-xgboost=0.72
-lightgbm=2.2.1
-sklearn=0.19.1
-numpy>=1.14
-pandas>=0.23
+hyperopt>=0.2
+xgboost>=1.2
+lightgbm>=2.3
+sklearn=0.23
+numpy>=1.19
+pandas>=1.0
