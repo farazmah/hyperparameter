@@ -48,20 +48,20 @@ Usage example for xgboost (last three lines from example above changes to):
 
 ```python
 from hyperparameter.xgb import XgboostHyper
-hpot = XgboostHyper(is_classifier=True)
+hpopt = XgboostHyper(is_classifier=True)
 
 hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
 ```
 
 ```python
-Out[2]: {'colsample_bytree': 0.9,
-         'learning_rate': 0.05,
-         'max_depth': 10,
-         'min_child_samples': 9,
-         'min_sum_hessian_in_leaf': 0.397,
-         'n_estimators': 2730,
-         'num_leaves': 1018,
-         'reg_alpha': 1.11,
-         'reg_lambda': 0.43,
-         'subsample': 0.8}
+Out[2]: {'colsample_bylevel': 0.65,
+         'colsample_bytree': 0.5,
+         'gamma': 0.75,
+         'learning_rate': 0.24,
+         'max_depth': 4,
+         'min_child_weight': 6,
+         'n_estimators': 1290,
+         'reg_alpha': 2.0,
+         'reg_lambda': 1.48,
+         'subsample': 0.7000000000000001}
 ```
