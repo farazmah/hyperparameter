@@ -2,7 +2,7 @@
 
 Installation
 ```
-git clone https://faraz_ma@bitbucket.org/wesaac/hyperparameter.git
+git clone git@github.com:farazmah/hyperparameter.git
 cd hyperparamter/hyperparameter
 python ../setup.py install
 ```
@@ -24,7 +24,7 @@ X_train = df.drop(['Survived'], axis=1).values
 
 skf = StratifiedKFold(n_splits=3)
 
-from hyperparameter import LightgbmHyper
+from hyperparameter.lgbm import LightgbmHyper
 hpopt = LightgbmHyper(is_classifier=True)
 
 hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
@@ -34,6 +34,7 @@ hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
 Usage example for xgboost (last two lines from example above changes to):
 
 ```python
+from hyperparameter.xgb import XgboostHyper
 hpot = XgboostHyper(is_classfier=True)
 
 hpopt.tune_model(ds_x=X_train, ds_y=y_train, folds=skf, eval_rounds = 20)
