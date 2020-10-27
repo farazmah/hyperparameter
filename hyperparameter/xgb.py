@@ -1,22 +1,12 @@
 """
 Xgboost hyperparameter tuning module
 """
-import logging
-
 import xgboost
 from hyperopt import fmin, tpe, hp
 from hyperopt.pyll import scope
 
 from .base import Hyperparameter
-
-# Logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+from .utils import logger
 
 
 class XgboostHyper(Hyperparameter):

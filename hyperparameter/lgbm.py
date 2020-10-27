@@ -1,23 +1,12 @@
 """
 lightGBM hyperparameter tuning module
 """
-import logging
-
 import lightgbm
 from hyperopt import fmin, tpe, hp
 from hyperopt.pyll import scope
 
 from .base import Hyperparameter
-
-# Logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
+from .utils import logger
 
 class LightgbmHyper(Hyperparameter):
     def __init__(self, is_classifier=False):

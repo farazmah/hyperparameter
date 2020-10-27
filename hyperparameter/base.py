@@ -1,24 +1,15 @@
 """
 This is the base module of the hyperparameter tuner
 """
-import logging
 from abc import ABCMeta, abstractmethod
 
 import pandas as pd
 import numpy as np
 
 from sklearn.metrics import mean_squared_error, log_loss
-
 from hyperopt import STATUS_OK, Trials
 
-# Logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+from .utils import logger
 
 
 class Hyperparameter:
@@ -107,11 +98,11 @@ class Hyperparameter:
         """
 
         def loss_func(params):
-            logging.info("Training with params : ")
-            logging.info(params)
+            logger.info("Training with params : ")
+            logger.info(params)
             model = self.estimator.set_params(**params)
             loss = self.cross_validation_score(model, x_train, y_train, folds, groups)
-            logging.info("\tLoss {0}\n".format(loss))
+            logger.info("\tLoss {0}\n".format(loss))
             return {"loss": loss, "status": STATUS_OK}
 
         return loss_func
