@@ -1,2 +1,3 @@
 .idea/
-/hyperparameter/__pycache__/
+hyperparameter/__pycache__/
+hyperparameter/test/__pycache__/
